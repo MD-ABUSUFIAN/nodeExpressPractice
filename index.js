@@ -4,7 +4,7 @@ const{log}=require("console")
 const {databseConnection}=require("./src/database/db")
 
 databseConnection().then(()=>{
-app.listen(port || 5000,()=>{
+app.listen(` ${port || 5000} `,()=>{
     log(" server is running on http://localhost:", port)
 })
 }).catch((error)=>{

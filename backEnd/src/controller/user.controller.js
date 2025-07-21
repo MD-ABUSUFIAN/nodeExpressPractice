@@ -2,7 +2,7 @@ const userModel=require("../model/user.model")
 const {checker}=require("../helpers/bodyValidation")
 
 exports.registration=async(req,res)=>{
-    const {userName,userEmail,userPhone,userPassword}=req.body; 
+    const {userName,userEmail,userPassword,address}=req.body; 
   try {
       // validation 
     if(!userName){
@@ -10,14 +10,19 @@ exports.registration=async(req,res)=>{
             msg:"user Name is Missing"  
         })
     }
+    if(!userEmail){
+        return res.status(404).json({
+            msg:"user Email is Missing"  
+        })
+    }
     if(!userPassword){
         return res.status(404).json({
             msg:"user pASSWORD is Missing"  
         })
     }
-    if(!userPhone){
+    if(!address){
         return res.status(404).json({
-            msg:"user phone number is Missing"  
+            msg:"user address is Missing"  
         })
     }
     // databse save this data 
@@ -25,7 +30,7 @@ exports.registration=async(req,res)=>{
         userName:userName,
         userEmail:userEmail,
         userPassword:userPassword,
-        userPhone:userPhone 
+        address:address 
     })
     return res.status(201).json({
         msg:"database create successfully"
@@ -35,6 +40,8 @@ exports.registration=async(req,res)=>{
   }
     
 }
+
+// login 
 exports.login=async(req,res)=>{
     try {
         const{missing,fieldName}=checker(req)
@@ -43,19 +50,20 @@ exports.login=async(req,res)=>{
             msg:`${fieldName} missing`
         })
      }
- const findUser=await userModel.findOne({userEmail:req.body.userEmail})
+ const findUser= await userModel.findOne({userEmail:req?.body?.userEmail})
 
     //  return
- if(findUser.userEmail==req.body.userEmail && findUser.userPassword==req.body.userPassword){
-    findUser.userPhone="01722123801"
+ if(findUser?.userEmail==req?.body?.userEmail && findUser?.userPassword==req?.body?.userPassword){
+    // findUser.userPhone="01722123801"
     await findUser.save()
     return res.status(200).json({
-        msg:"user login successfully"
+        msg:"user login successfully",
+        data:findUser
     })
   
  }
 else{
-    res.status(200).json({
+    res.status(201).json({
         msg:"email or password wrong"
     })
 }

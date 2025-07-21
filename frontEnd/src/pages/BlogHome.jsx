@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios'
 
 const BlogHome = () => {
+    const [blogs, setBlogs] = useState([]);
+    const[realTime,setRealTime]=useState(false)
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
+    
+    blogTitle: "",
+    blogDescription: "",
     image: null,
   });
+// fetch all blogs 
+useEffect(()=>{
+  const allBlog=async()=>{
+    try {
+      const response=await axios.get("http://localhost:4000/getAllBlog")
+      if(response?.data?.blog){
+       setBlogs(response?.data?.blog )
+      }
+      else{
+        console.log("blog not found")
+      }
+     
+      console.log(response?.data?.blog)
+      
+    } catch (error) {
+      console.log("error fetching all blogs data",error)
+    }
+   
+  }
+allBlog()
+},[realTime])
 
-  const [blogs, setBlogs] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -19,28 +43,23 @@ const BlogHome = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-
-    if (!formData.title || !formData.description || !formData.image) {
-      alert("Please fill all fields.");
-      return;
+try {
+  const{blogTitle,blogDescription,image}=formData;
+  const fromInput= new FormData()
+  fromInput.append("blogTitle",blogTitle)
+  fromInput.append("blogDescription",blogDescription)
+  fromInput.append("image",image)
+  const response= await axios.post("http://localhost:4000/createBlog",fromInput)
+  console.log(response)
+} catch (error) {
+  console.log("Error Submitted Blog",error)
+}
+ finally{
+      setRealTime(!realTime)
     }
 
-    const newBlog = {
-      title: formData.title,
-      description: formData.description,
-      imageURL: URL.createObjectURL(formData.image),
-    };
-
-    setBlogs([newBlog, ...blogs]);
-
-    // Clear form
-    setFormData({
-      title: "",
-      description: "",
-      image: null,
-    });
   };
 
   return (
@@ -54,8 +73,8 @@ const BlogHome = () => {
               <label className="block mb-1 text-gray-600">Blog Title</label>
               <input
                 type="text"
-                name="title"
-                value={formData.title}
+                name="blogTitle"
+                value={formData.blogTitle}
                 onChange={handleChange}
                 placeholder="Enter title"
                 className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -66,8 +85,8 @@ const BlogHome = () => {
             <div>
               <label className="block mb-1 text-gray-600">Blog Description</label>
               <textarea
-                name="description"
-                value={formData.description}
+                name="blogDescription"
+                value={formData.blogDescription}
                 onChange={handleChange}
                 rows="3"
                 placeholder="Enter description"
@@ -98,7 +117,7 @@ const BlogHome = () => {
         </div>
 
         {/* Right: Blog List */}
-        <div className="w-full lg:w-1/2 bg-white p-6 rounded-2xl shadow overflow-y-auto max-h-[80vh]">
+        <div className="w-1/3  bg-white p-6 rounded-2xl shadow overflow-y-auto max-h-[80vh]">
           <h2 className="text-2xl font-bold mb-4 text-gray-700">Submitted Blogs</h2>
           <div className="space-y-4">
             {blogs.length === 0 ? (
@@ -110,14 +129,14 @@ const BlogHome = () => {
                   className="flex items-center gap-4 border p-3 rounded-lg"
                 >
                   <img
-                    src={blog.imageURL}
+                    src={blog?.image}
                     alt="Blog Thumbnail"
                     className="w-20 h-20 object-cover rounded-md"
                   />
                   <div>
-                    <h4 className="text-lg font-semibold">{blog.title}</h4>
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {blog.description}
+                    <h4 className=" font-bold text-xl">{blog.blogTitle}</h4>
+                    <p className=" text-gray-600 line-clamp-2 font-bold text-sm">
+                      {blog?.blogDescription}
                     </p>
                   </div>
                 </div>

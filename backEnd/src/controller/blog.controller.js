@@ -5,7 +5,7 @@ const blogModel=require('../model/blog.model')
 exports.createBlog=async(req,res)=>{
     try {
         const{blogTitle,blogDescription,user}=req.body;
-      console.log(req.file.originalname)
+      console.log(req?.file?.originalname)
        const blog=await new blogModel({
         blogTitle,blogDescription,
         user:user,

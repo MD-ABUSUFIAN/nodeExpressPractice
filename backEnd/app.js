@@ -27,7 +27,8 @@ app.get('/category/:id',categoryController.singlecategory)
 app.post('/createBlog',upload.single('image'),blogController.createBlog)
 app.get('/getAllBlog',blogController.getAllBlogs)
 app.get('/singleBlog/:id',blogController.getSingleBlog)
-
+app.put('/updateBlog/:slug',upload.single('image'),blogController.blogUpdate)
+app.delete('/deleteBlog/:slug',blogController.blogDelete)
 
 app.use('/static', express.static(path.join("Public/temp")))
 
